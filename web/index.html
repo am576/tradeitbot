@@ -7,16 +7,169 @@
 
     <link rel="stylesheet" href="main.css">
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="mdi/css/materialdesignicons.min.css">
     <script type="text/javascript" src="/eel.js"></script> 
+    <script type="text/javascript" src="jquery-3.7.1.min.js"></script> 
+    <script type="text/javascript" src="popper.min.js"></script> 
     <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <div class="app container text-center">
-        <div class="col-2">1</div>
-        <div class="col-8">2</div>
-        <div class="col-2">3</div>
-        <!-- <a class="active" id="button-test">Test selenium driver</a> -->
-      </div> 
+    <div class="container">
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-10 items">
+                <div id="item-list">
+                    <!-- Dynamically generated rows will be inserted here -->
+                </div>
+            </div>
+            <div class="col-1"></div>
+        </div>
+        
+        <button class="btn btn-primary" id="add-row">Добавить</button>
+    </div>
+
+    <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-labelledby="confirm-modal-label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirm-modal-label">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Точно удалить?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary refuse" data-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-danger" id="confirm-remove">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let rowCounter = 1;
+        
+        $('#confirm-modal').on('hidden.bs.modal', function () {
+            $('#confirm-remove').off('click');
+        });
+        function createDivRow(itemName, price) {
+            let row = document.createElement('div');
+            row.classList.add('row-container','item-row');
+
+            let nameLabel = document.createElement('div');
+            nameLabel.classList.add('item-name', 'col-6');
+            nameLabel.textContent =  itemName;
+            row.appendChild(nameLabel);
+
+            let priceLabel = document.createElement('div');
+            priceLabel.classList.add('item-price','col-4');
+            priceLabel.textContent =  price;
+            row.appendChild(priceLabel);
+
+            let buttonsContainer = document.createElement('div');
+            buttonsContainer.classList.add('buttons-container','col-2');
+            row.appendChild(buttonsContainer);
+
+            let editButton = document.createElement('button');
+            editButton.classList.add('btn', 'btn-primary', 'btn-sm', 'edit-button');
+            editButton.innerHTML = '<span class="mdi mdi-pencil"></span>';
+            editButton.addEventListener('click',
+                function() {
+                    editButton.style.display = 'none';
+                    nameLabel.style.display = 'none';
+                    priceLabel.style.display = 'none';
+                    let nameInput = document.createElement('input');
+                    nameInput.classList.add('name-input')
+                    nameInput.type = 'text';
+                    nameInput.value = itemName;
+                    row.insertBefore(nameInput, buttonsContainer);
+                    let priceInput = document.createElement('input');
+                    priceInput.classList.add('price-input')
+                    priceInput.type = 'text';
+                    priceInput.value = price;
+                    row.insertBefore(priceInput, buttonsContainer);
+                    row.setAttribute("editing", true)
+                });
+            buttonsContainer.appendChild(editButton);
+
+            var deleteButton = document.createElement('button');
+            deleteButton.classList.add('btn', 'btn-danger', 'btn-sm');
+            deleteButton.innerHTML = '<span class="mdi mdi-trash-can-outline"></span>';
+            deleteButton.addEventListener('click', function() {
+                $('#confirm-modal').modal('show');
+                $('#confirm-remove').off('click').on('click', function() {
+                    row.remove();
+                    $('#confirm-modal').modal('hide');
+                });
+            });
+            buttonsContainer.appendChild(deleteButton);
+            
+            return row;
+        }
+        function handleClickOutsideInputs(event) {
+            let input1s = document.querySelectorAll(".name-input");
+            let input2s = document.querySelectorAll(".price-input");
+            let editButtons = document.querySelectorAll(".edit-button");
+
+            var isInsideInputs = Array.from(input1s).some(function (input1) {
+                return input1.contains(event.target);
+            }) || Array.from(input2s).some(function (input2) {
+                return input2.contains(event.target);
+            });
+
+            var isInsideEditButtons = Array.from(editButtons).some(function (editButton) {
+                return editButton.contains(event.target);
+            });
+
+            if (!isInsideInputs && !isInsideEditButtons) {
+            // Call your function here
+            
+                hideInputs();
+            }
+            
+        }   
+        function hideInputs() {
+            const rows = document.getElementsByClassName("item-row");
+            Array.from(rows).forEach(function(row) {
+                var isEditing = row.getAttribute("editing") === "true";
+                if (isEditing) {
+                    const nameLabel = row.querySelector('.item-name');
+                    const nameInput = row.querySelector('.name-input');
+                    const priceLabel = row.querySelector('.item-price');
+                    const priceInput = row.querySelector('.price-input');
+                    const editButton = row.querySelector('.edit-button');
+                    editButton.style.display = 'block';
+                    nameLabel.style.display = 'block';
+                    nameLabel.textContent = '' + nameInput.value;
+                    nameInput.remove();
+                    priceLabel.style.display = 'block';
+                    priceLabel.textContent = '' + priceInput.value;
+                    priceInput.remove();
+                    row.setAttribute("editing", false)
+                }
+            });
+            
+        }
+
+function addDivRow(itemName, price) {
+    var newRow = createDivRow(itemName, price);
+    document.getElementById('item-list').appendChild(newRow);
+}
+
+// Usage:
+// addDivRow('Item 1', '10');
+// addDivRow('Item 2', '15');
+
+function addRow() {
+    var newRow = addDivRow('Mann Co. Supply Crate Key', '100');
+    document.getElementById('item-list').appendChild(newRow);
+}
+
+document.getElementById('add-row').addEventListener('click', addRow);
+document.addEventListener("click", handleClickOutsideInputs);
+</script>
 </body>
 <script src="main.js"></script>
 </html>
