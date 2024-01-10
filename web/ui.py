@@ -1,7 +1,9 @@
+import sqlite3
 import eel
 import random
 from datetime import datetime
 import time
+import json
 from web.web_controller import Webcontroller
 
 class UI:
@@ -33,8 +35,28 @@ class UI:
     def start(self):
         eel.start('index.html')
 
+    def loadItems(self):
+        conn = sqlite3.connect('db.sqlite')
+        c = conn.cursor()
+        c.execute("SELECT * FROM items")
+        data = c.fetchall()
+
+        keys = ['id', 'name', 'price']
+        json_data = [dict(zip(keys, row)) for row in data]
+
+        json_string = json.dumps(json_data)
+        conn.close()
+
+        return json_string
+
 ui = UI()
-ui.start()
 @eel.expose
 def test_selenium():
     ui.test_selenium()
+
+@eel.expose
+def loadItems():
+    items = ui.loadItems()
+    eel.createItemRows(items)
+
+ui.start()
