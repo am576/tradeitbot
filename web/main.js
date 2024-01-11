@@ -106,3 +106,15 @@ function hideInputs() {
       }
   });
 }
+
+function saveItems() {
+  const rows = document.getElementsByClassName("item-row");
+  let items = [];
+  for (let row of rows) {
+    const name = row.children[0].innerHTML
+    const price = row.children[1].innerHTML
+    items.push({name: name, price: price});
+  }
+  console.log(items);
+  eel.saveItems(items);
+}

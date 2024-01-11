@@ -17,17 +17,18 @@
 <body>
     <div class="container">
         <div class="row">
-            <div class="col-1"></div>
+            <div class="col-1">
+                <button class="btn btn-primary" id="add-row">Добавить</button>
+            </div>
             <div class="col-10 items">
                 <div id="item-list">
                     <!-- Dynamically generated rows will be inserted here -->
                 </div>
             </div>
-            <div class="col-1"></div>
+            <div class="col-1">
+                <button class="btn btn-primary" id="save-items">Сохранить</button>
+            </div>
         </div>
-        
-        <button class="btn btn-primary" id="add-row">Добавить</button>
-        
     </div>
     <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-labelledby="confirm-modal-label" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -56,8 +57,6 @@
             $('#confirm-remove').off('click');
         });
         
-        
-
         eel.expose(createItemRows)
         function createItemRows(items) {
             items = JSON.parse(items)
@@ -77,6 +76,7 @@
         }
 
         document.getElementById('add-row').addEventListener('click', addRow);
+        document.getElementById('save-items').addEventListener('click', saveItems);
         document.addEventListener("mousedown", handleClickOutsideInputs);
         eel.loadItems()
     </script>

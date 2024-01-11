@@ -48,15 +48,31 @@ class UI:
         conn.close()
 
         return json_string
+    
+    def saveItems(self, items):
+    # Connect to the SQLite database
+        conn = sqlite3.connect('db.sqlite')
+        c = conn.cursor()
+
+        # Insert the items into the table
+        for item in items:
+            name = item['name']
+            price = item['price']
+            c.execute("INSERT INTO items (name, price) VALUES (?, ?)", (name, price))
+
+        # Commit the changes and close the database connection
+        conn.commit()
+        conn.close()
 
 ui = UI()
-@eel.expose
-def test_selenium():
-    ui.test_selenium()
 
 @eel.expose
 def loadItems():
     items = ui.loadItems()
     eel.createItemRows(items)
+
+@eel.expose
+def saveItems(items):
+    ui.saveItems(items)
 
 ui.start()
