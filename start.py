@@ -1,5 +1,6 @@
 import time
 import os
+from sda.steam_guard import SteamGuard
 
 
 from web.ui import UI
@@ -21,5 +22,6 @@ def main():
 if __name__ == "__main__":
     try:
         main()
+        
     except KeyboardInterrupt:
         pass

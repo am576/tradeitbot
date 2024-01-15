@@ -39,7 +39,7 @@ class SteamGuard:
         return code
 
     def loadMaFile(self):
-        file_pattern = "*.maFile"
+        file_pattern = "./sda/*.maFile"
 
         file_path = glob.glob(file_pattern)
 
